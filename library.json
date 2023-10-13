@@ -1,0 +1,20 @@
+{
+  "name": "Flowmeter",
+  "version": "1.0",
+  "description": "Measure the amount of water.",
+  "keywords": "sensor, flow meter, measurment, water meter",
+  "authors":
+  {
+    "name":  "Arief BP",
+    "url":   "https://github.com/archytech99",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/archytech99/swam.git"
+  },
+  "homepage": "https://github.com/archytech99/swam",
+  "frameworks": [ "arduino" ],
+  "platforms": "*"
+}
