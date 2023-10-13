@@ -12,9 +12,9 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/archytech99/swam.git"
+    "url": "https://github.com/archytech99/Flowmeter.git"
   },
-  "homepage": "https://github.com/archytech99/swam",
+  "homepage": "https://github.com/archytech99/Flowmeter",
   "frameworks": [ "arduino" ],
   "platforms": "*"
 }
