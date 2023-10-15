@@ -31,8 +31,7 @@ void Flowmeter::init(int _uplit, double _tolit) {
   pinMode(sensorPin, INPUT);
   digitalWrite(sensorPin, LOW);
   attachInterrupt(sensorInterrupt, pulseCounter, RISING);
-  upLiters    = _uplit;
-  totalLiters = _tolit;
+  set(_uplit, _tolit);
 }
 
 /*
