@@ -18,10 +18,6 @@ void Flowmeter::debug(bool _set = false) {
   {
     pulseCount = random(9,49);
   }
-  else
-  {
-    pulseCount = 0;
-  }
 }
 
 /*
