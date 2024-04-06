@@ -17,6 +17,7 @@
       unsigned long max_limit = 1000000;
       float calibrationFactor = 0.001f;
       float tolerance = 0.000f;
+      unsigned long oneSecTime = 1000;
       unsigned long oldTime;
 
     protected:
