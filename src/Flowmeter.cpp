@@ -28,9 +28,10 @@ void Flowmeter::debug(bool _set = false)
 void Flowmeter::init(int _uplit, double _tolit)
 {
   pinMode(sensorPin, INPUT);
-  digitalWrite(sensorPin, LOW);
-  attachInterrupt(sensorInterrupt, pulseCounter, RISING);
+  digitalWrite(sensorPin, HIGH);
+  attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
   set(_tolit, _uplit);
+  oldTime = millis();
 }
 
 /*
@@ -38,20 +39,19 @@ void Flowmeter::init(int _uplit, double _tolit)
  */
 void Flowmeter::loop(void)
 {
-  if ((millis() - oldTime) > oneSecTime)
+  if ((millis() - oldTime) > 1000)
   {
     detachInterrupt(sensorInterrupt);
 
-    unsigned long pulse = (oneSecTime / (millis() - oldTime)) * pulseCount;
-    float _flowrate = pulse / calibrationFactor;
+    float _flowrate = ((1000.0 / (millis() - oldTime)) * pulseCount) / calibrationFactor;
     float _liter = _flowrate / 60;
     oldTime = millis();
-    liters = _liter - (_liter * tolerance) / 60;
+    liters = (tolerance > 0.000f) ? (_liter - ((_liter * tolerance) / 60)) : _liter;
     totalLiters += liters;
     pulseCount = 0;
     sumTotalLiter(totalLiters);
 
-    attachInterrupt(sensorInterrupt, pulseCounter, RISING);
+    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
   }
 }
 
