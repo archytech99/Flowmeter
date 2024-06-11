@@ -39,7 +39,7 @@ void Flowmeter::init(int _uplit, double _tolit)
  */
 void Flowmeter::loop(void)
 {
-  if ((millis() - oldTime) > 1000)
+  if ((millis() - oldTime) > 999)
   {
     detachInterrupt(sensorInterrupt);
 
