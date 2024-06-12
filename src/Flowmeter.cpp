@@ -14,11 +14,11 @@ Flowmeter::Flowmeter(byte _sensor)
 /*
   Set Debug Measurement Flowmeter
  */
-void Flowmeter::debug(bool _set = false)
+void Flowmeter::debug(bool _set = false, int _min = 9, int _max = 49)
 {
   if (_set)
   {
-    pulseCount = random(9, 49);
+    pulseCount = random(_min, _max);
   }
 }
 
