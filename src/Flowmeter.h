@@ -48,7 +48,7 @@ public:
   int upLiters = 0;
 
   Flowmeter(byte _sensor);
-  void debug(bool _set, int _min = 9, int _max = 49);
+  void debug(bool _set, int _min, int _max);
   void init(int _uplit, double _tolit);
   void loop(void);
   void reset(void);
