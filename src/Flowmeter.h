@@ -27,7 +27,7 @@ protected:
   }
   void sumTotalLiter(double _totalLiters)
   {
-    if (_totalLiters > (max_limit - 4))
+    if (_totalLiters > max_limit)
     {
       upLiters++;
       long _total = _totalLiters;
