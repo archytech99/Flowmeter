@@ -2,7 +2,13 @@
 
 volatile byte pulseCount;
 
-void pulseCounter(void) { pulseCount++; }
+#if defined(__AVR__)
+  void pulseCounter(void) { pulseCount++; }
+#elif defined(ESP32)
+  void IRAM_ATTR pulseCounter(void) { pulseCount++; }
+#else
+  void pulseCounter(void) { pulseCount++; }
+#endif
 
 Flowmeter::Flowmeter(byte _sensor)
 {
@@ -27,11 +33,9 @@ void Flowmeter::debug(bool _set = false, int _min = 9, int _max = 49)
  */
 void Flowmeter::init(int _uplit, double _tolit)
 {
-  pinMode(sensorPin, INPUT);
-  digitalWrite(sensorPin, HIGH);
+  pinMode(sensorPin, INPUT_PULLUP);
   attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
   set(_tolit, _uplit);
-  oldTime = millis();
 }
 
 /*
@@ -39,16 +43,16 @@ void Flowmeter::init(int _uplit, double _tolit)
  */
 void Flowmeter::loop(void)
 {
-  if ((millis() - oldTime) > 999)
+  if ((millis() - oldTime) > 1000L)
   {
     detachInterrupt(sensorInterrupt);
 
     float _flowrate = ((1000.0 / (millis() - oldTime)) * pulseCount) / calibrationFactor;
     float _liter = _flowrate / 60;
     oldTime = millis();
-    liters = (tolerance > 0.000f) ? (_liter - ((_liter * tolerance) / 60)) : _liter;
-    totalLiters += liters;
     pulseCount = 0;
+    liters = (tolerance > 0.00f) ? (_liter - ((_liter * tolerance) / 60)) : _liter;
+    totalLiters += liters;
     sumTotalLiter(totalLiters);
 
     attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
@@ -60,9 +64,8 @@ void Flowmeter::loop(void)
  */
 void Flowmeter::reset(void)
 {
-  liters = 0;
+  upLiters = 0;
   totalLiters = 0.0;
-  oldTime = 0;
 }
 
 /*
