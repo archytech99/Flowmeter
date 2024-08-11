@@ -51,7 +51,7 @@ void Flowmeter::loop(void)
     float _liter = _flowrate / 60;
     oldTime = millis();
     pulseCount = 0;
-    liters = (tolerance > 0.00f) ? (_liter - ((_liter * tolerance) / 60)) : _liter;
+    liters = (tolerance > 0.00f) ? (_liter - (_liter * tolerance)) : _liter;
     totalLiters += liters;
     sumTotalLiter(totalLiters);
 
