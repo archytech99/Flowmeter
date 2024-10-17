@@ -27,7 +27,7 @@ protected:
   }
   void sumTotalLiter(double _totalLiters)
   {
-    if (_totalLiters > (max_limit - 4))
+    if (_totalLiters > max_limit)
     {
       upLiters++;
       long _total = _totalLiters;
@@ -48,7 +48,7 @@ public:
   int upLiters = 0;
 
   Flowmeter(byte _sensor);
-  void debug(bool _set);
+  void debug(bool _set, int _min, int _max);
   void init(int _uplit, double _tolit);
   void loop(void);
   void reset(void);
