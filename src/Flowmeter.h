@@ -12,53 +12,28 @@
 
 class Flowmeter
 {
-private:
-  byte sensorInterrupt = 0;
-  byte sensorPin = 2;
-  unsigned long max_limit = 100000;
-  float calibrationFactor = 0.001f;
-  float tolerance = 0.000f;
-  unsigned long oldTime;
-
-protected:
-  long multiplier(void)
-  {
-    return max_limit * upLiters;
-  }
-  void sumTotalLiter(double _totalLiters)
-  {
-    if (_totalLiters > max_limit)
-    {
-      upLiters++;
-      long _total = _totalLiters;
-      float _sisa = _totalLiters - _total;
-      long _liter = _totalLiters - max_limit;
-      totalLiters = _liter;
-      if (_sisa > 0.499)
-      {
-        totalLiters += 1.0;
-      }
-    }
-  }
-
 public:
-  const float kubik = 0.001;
-  double totalLiters;
-  float liters;
-  int upLiters = 0;
+  explicit Flowmeter(uint8_t pin);
 
-  Flowmeter(byte _sensor);
-  void debug(bool _set, int _min, int _max);
-  void init(int _uplit, double _tolit);
-  void loop(void);
-  void reset(void);
-  void set(float _cal, float _tol, long maxlim);
-  void set(double _liter, int _upliter);
-  double getVolume(void)
-  {
-    long _mulp = multiplier();
-    return ((_mulp + totalLiters) * kubik);
-  }
+  void begin(float calibrationFactor, float tolerancePercent = 0.0f);
+  void update();
+  void reset();
+
+  float getFlowLps() const;
+  double getTotalLiters() const;
+  uint64_t getTotalMilliLiters() const;
+
+private:
+  uint8_t _pin;
+  uint8_t _interrupt;
+  float _calFactor;
+  float _tolerance;
+  uint64_t _totalMl;
+  float _flowLps;
+
+  unsigned long _lastMs;
+
+  static void isrHandler();
 };
 
 #endif

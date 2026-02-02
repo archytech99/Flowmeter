@@ -1,88 +1,99 @@
 #include "Flowmeter.h"
 
-volatile byte pulseCount;
+volatile uint32_t pulseCount = 0;
 
-#if defined(__AVR__)
-  void pulseCounter(void) { pulseCount++; }
-#elif defined(ESP32)
-  void IRAM_ATTR pulseCounter(void) { pulseCount++; }
+#if defined(ESP32)
+void IRAM_ATTR Flowmeter::isrHandler()
+{
+  pulseCount++;
+}
 #else
-  void pulseCounter(void) { pulseCount++; }
+void Flowmeter::isrHandler()
+{
+  pulseCount++;
+}
 #endif
 
-Flowmeter::Flowmeter(byte _sensor)
+Flowmeter::Flowmeter(uint8_t pin)
+    : _pin(pin),
+      _interrupt(digitalPinToInterrupt(pin)),
+      _calFactor(1.0f),
+      _tolerance(0.0f),
+      _totalMl(0),
+      _flowLps(0.0f),
+      _lastMs(0)
 {
-  sensorPin = _sensor;
-  sensorInterrupt = digitalPinToInterrupt(sensorPin);
-  oldTime = 0;
 }
 
-/*
-  Set Debug Measurement Flowmeter
- */
-void Flowmeter::debug(bool _set = false, int _min = 9, int _max = 49)
+void Flowmeter::begin(float calibrationFactor, float tolerancePercent)
 {
-  if (_set)
+  _calFactor = calibrationFactor;
+  _tolerance = tolerancePercent / 100.0f;
+
+  pinMode(_pin, INPUT_PULLUP);
+  attachInterrupt(_interrupt, isrHandler, FALLING);
+  _lastMs = millis();
+}
+
+void Flowmeter::update()
+{
+  unsigned long now = millis();
+  unsigned long deltaMs = now - _lastMs;
+
+  if (deltaMs < 1000)
+    return;
+
+  _lastMs = now;
+
+  // atomic snapshot
+  noInterrupts();
+  uint32_t pulse = pulseCount;
+  pulseCount = 0;
+  interrupts();
+
+  if (pulse == 0)
   {
-    pulseCount = random(_min, _max);
+    _flowLps = 0.0f;
+    return;
   }
+
+  // frequency (Hz)
+  float freq = (1000.0f * pulse) / deltaMs;
+
+  // Liter per second
+  float lps = freq / _calFactor;
+
+  if (_tolerance > 0.0f)
+    lps *= (1.0f - _tolerance);
+
+  _flowLps = lps;
+
+  // Integrasi volume → mL
+  uint64_t deltaMl = (uint64_t)(lps * (deltaMs / 1000.0f) * 1000.0f);
+  _totalMl += deltaMl;
 }
 
-/*
-  Initial Setup Flowmeter
- */
-void Flowmeter::init(int _uplit, double _tolit)
+void Flowmeter::reset()
 {
-  pinMode(sensorPin, INPUT_PULLUP);
-  attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
-  set(_tolit, _uplit);
+  noInterrupts();
+  pulseCount = 0;
+  interrupts();
+
+  _totalMl = 0;
+  _flowLps = 0.0f;
 }
 
-/*
-  The measurement of discharge water - Liter per Second
- */
-void Flowmeter::loop(void)
+float Flowmeter::getFlowLps() const
 {
-  if ((millis() - oldTime) > 1000L)
-  {
-    detachInterrupt(sensorInterrupt);
-
-    float _flowrate = ((1000.0 / (millis() - oldTime)) * pulseCount) / calibrationFactor;
-    float _liter = _flowrate / 60;
-    oldTime = millis();
-    pulseCount = 0;
-    liters = (tolerance > 0.00f) ? (_liter - (_liter * tolerance)) : _liter;
-    totalLiters += liters;
-    sumTotalLiter(totalLiters);
-
-    attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
-  }
+  return _flowLps;
 }
 
-/*
-  Change value of Calibration Factor and Tolerance
- */
-void Flowmeter::reset(void)
+double Flowmeter::getTotalLiters() const
 {
-  upLiters = 0;
-  totalLiters = 0.0;
+  return _totalMl / 1000.0;
 }
 
-/*
-  Change value of Calibration Factor and Tolerance
- */
-void Flowmeter::set(float _cal, float _tol, long maxlim)
+uint64_t Flowmeter::getTotalMilliLiters() const
 {
-  calibrationFactor = _cal;
-  tolerance = _tol / 100;
-  max_limit = maxlim;
-}
-
-/*
-  Change value of Calibration Factor and Tolerance
- */
-void Flowmeter::set(double _liter, int _upliter)
-{
-  upLiters = _upliter;
-  totalLiters = _liter;
+  return _totalMl;
 }
