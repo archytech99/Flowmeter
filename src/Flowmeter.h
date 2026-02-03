@@ -25,15 +25,14 @@ public:
 
 private:
   uint8_t _pin;
-  uint8_t _interrupt;
+  int8_t _interrupt;
   float _calFactor;
   float _tolerance;
   uint64_t _totalMl;
   float _flowLps;
+  bool _valid;
 
   unsigned long _lastMs;
-
-  static void isrHandler();
 };
 
 #endif
