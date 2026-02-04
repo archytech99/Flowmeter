@@ -4,7 +4,7 @@ Flowmeter fw(PIN_SENSOR);
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  Serial.begin(9600);
   int irq = digitalPinToInterrupt(PIN_SENSOR);
   if (irq < 0) {
     Serial.println("Flowmeter: invalid interrupt pin.");
@@ -14,7 +14,7 @@ void setup() {
     Serial.println("ESP32: recommended GPIOs: 4, 5, 13, 14, 16, 17, 18, 19, 21, 22, 23, 25-27, 32, 33.");
   }
 
-  fw.begin(0.208f, 0.0f); // calibration, tolerance %
+  fw.begin(12.7f, 0.0f); // calibration, tolerance %
 
 }
 
@@ -23,10 +23,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   fw.update();
 
-  if ((millis()-oldLoop) > 1000L && fw.getFlowLps() != 0.0f) {
+  if ((millis()-oldLoop) > 1000L && fw.getFlowLps() > 0.0001f) {
     oldLoop = millis();
     Serial.print("Flow LPS: ");
     Serial.println(fw.getFlowLps(), 4);
+    Serial.print("Flow LPM: ");
+    Serial.println(fw.getFlowLpm(), 3);
+    Serial.print("Flow LPH: ");
+    Serial.println(fw.getFlowLph(), 2);
 
     Serial.print("Total L: ");
     Serial.println(fw.getTotalLiters(), 3);
