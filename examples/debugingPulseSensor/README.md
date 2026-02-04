@@ -1,6 +1,6 @@
 # Implementation
 
-> YF‑DN50 (_the black plastic_), the most common spec `F(Hz) = 0.2 × Q(L/min)`, which is `~12 pulses per liter`. [walmart.com][](https://www.walmart.com/ip/3-5-24Vdc-G2-YF-DN50-Plastic-Hall-Turbine-Water-Meter-NPN-Pulse-Output-Measurement-Flow-Sensor/8318069926)
+> YF‑DN50 (_the black plastic_), the most common spec `F(Hz) = 0.2 × Q(L/min)`, which is `~12 pulses per liter`. [walmart.com](https://www.walmart.com/ip/3-5-24Vdc-G2-YF-DN50-Plastic-Hall-Turbine-Water-Meter-NPN-Pulse-Output-Measurement-Flow-Sensor/8318069926)
 
 ## Recommended starting values (for your library)
 
