@@ -42,6 +42,10 @@ void loop() {
     oldLoop = millis();
     Serial.print("Flow LPS: ");
     Serial.println(fw.getFlowLps(), 4);
+    Serial.print("Flow LPM: ");
+    Serial.println(fw.getFlowLpm(), 3);
+    Serial.print("Flow LPH: ");
+    Serial.println(fw.getFlowLph(), 2);
 
     Serial.print("Total L: ");
     Serial.println(fw.getTotalLiters(), 3);

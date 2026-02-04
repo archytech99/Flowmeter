@@ -221,6 +221,16 @@ float Flowmeter::getFlowLps() const
   return _flowLps;
 }
 
+float Flowmeter::getFlowLpm() const
+{
+  return _flowLps * 60.0f;
+}
+
+float Flowmeter::getFlowLph() const
+{
+  return _flowLps * 3600.0f;
+}
+
 double Flowmeter::getTotalLiters() const
 {
   return _totalMl / 1000.0;

@@ -20,6 +20,8 @@ public:
   void reset();
 
   float getFlowLps() const;
+  float getFlowLpm() const;
+  float getFlowLph() const;
   double getTotalLiters() const;
   uint64_t getTotalMilliLiters() const;
 
