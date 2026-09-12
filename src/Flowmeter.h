@@ -18,6 +18,7 @@ public:
   void begin(float calibrationFactor, float tolerancePercent = 0.0f);
   void update();
   void reset();
+  bool set(float cal, float fac = 0.0f);
 
   float getFlowLps() const;
   float getFlowLpm() const;

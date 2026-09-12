@@ -216,6 +216,32 @@ void Flowmeter::reset()
   _flowLps = 0.0f;
 }
 
+/**
+  Update calibration factors and tolerances for water meter calculations.
+  */
+bool Flowmeter::set(float cal, float fac)
+{
+  if (!isfinite(cal)) {
+    return false;
+  }
+
+  if (!isfinite(fac)) {
+    return false;
+  }
+
+  if (cal <= 0.0f) {
+    return false;
+  }
+
+  if (fac < 0.0f) {
+    return false;
+  }
+  _calFactor = cal;
+  _tolerance = fac / 100.0f;
+
+  return true;
+}
+
 float Flowmeter::getFlowLps() const
 {
   return _flowLps;
