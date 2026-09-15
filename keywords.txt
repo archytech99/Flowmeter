@@ -6,20 +6,22 @@
 # Datatypes (KEYWORD1)
 ####################################
 
-Flowmeter  	KEYWORD1
+Flowmeter	KEYWORD1
 
 ####################################
 # Methods and Functions (KEYWORD2)
 ####################################
 
-debug         KEYWORD2
-init          KEYWORD2
-loop	      KEYWORD2
-reset	      KEYWORD2
-set	          KEYWORD2
-getSumVolume  KEYWORD2
-multiplier	  KEYWORD2
-sumTotalLiter KEYWORD2
+begin              KEYWORD2
+update             KEYWORD2
+reset              KEYWORD2
+set                KEYWORD2
+isValid            KEYWORD2
+getFlowLps         KEYWORD2
+getFlowLpm         KEYWORD2
+getFlowLph         KEYWORD2
+getTotalLiters     KEYWORD2
+getTotalMilliLiters KEYWORD2
 
 ####################################
 # Constants (LITERAL1)

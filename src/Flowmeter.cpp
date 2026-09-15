@@ -132,19 +132,20 @@ Flowmeter::Flowmeter(uint8_t pin)
       _calFactor(1.0f),
       _tolerance(0.0f),
       _totalMl(0),
+      _mlRemainder(0.0),
       _flowLps(0.0f),
       _valid(false),
       _lastMs(0)
 {
 }
 
-void Flowmeter::begin(float calibrationFactor, float tolerancePercent)
+bool Flowmeter::begin(float calibrationFactor, float tolerancePercent)
 {
   _interrupt = digitalPinToInterrupt(_pin);
   if (_interrupt < 0 || _interrupt >= FLOWMETER_MAX_INTERRUPTS)
   {
     _valid = false;
-    return;
+    return _valid;
   }
   _valid = true;
 
@@ -155,6 +156,13 @@ void Flowmeter::begin(float calibrationFactor, float tolerancePercent)
   pulseCounts[_interrupt] = 0;
   attachInterrupt(_interrupt, isrTable[_interrupt], FALLING);
   _lastMs = millis();
+
+  return _valid;
+}
+
+bool Flowmeter::isValid() const
+{
+  return _valid;
 }
 
 void Flowmeter::update()
@@ -197,9 +205,26 @@ void Flowmeter::update()
 
   _flowLps = lps;
 
-  // Integrasi volume → mL
-  uint64_t deltaMl = (uint64_t)(lps * (deltaMs / 1000.0f) * 1000.0f);
-  _totalMl += deltaMl;
+  // Integrate volume -> mL, carrying the fractional mL forward instead of
+  // discarding it (see integrateVolumeMl() for why this matters).
+  _totalMl += integrateVolumeMl(lps, deltaMs, _mlRemainder);
+}
+
+uint64_t Flowmeter::integrateVolumeMl(
+    float lps,
+    unsigned long deltaMs,
+    double &carryRemainderMl
+) {
+  // Use double throughout so we don't lose precision before the truncation
+  // below. lps is L/s, so lps * deltaMs already gives mL directly (1 L/s * 1 ms
+  // == 1 mL), no extra *1000/1000 round trip needed.
+  const double exactMl = static_cast<double>(lps) * static_cast<double>(deltaMs)
+                         + carryRemainderMl;
+
+  const uint64_t wholeMl = static_cast<uint64_t>(exactMl);
+  carryRemainderMl = exactMl - static_cast<double>(wholeMl);
+
+  return wholeMl;
 }
 
 void Flowmeter::reset()
@@ -213,6 +238,7 @@ void Flowmeter::reset()
   interrupts();
 
   _totalMl = 0;
+  _mlRemainder = 0.0;
   _flowLps = 0.0f;
 }
 
